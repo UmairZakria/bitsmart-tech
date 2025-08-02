@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --prime2: #db65e3;
+  --prime: #007bff;
+  --blues: #33b1ff;
+  --secbg: #fff8ff;
+  --soft-gradient: radial-gradient(circle at top left, #fdebf3, #e0f3ff, #fff8ff, #fdebf3);
+  --glass-gradient: radial-gradient(circle at top left, #fdebf3de, #e0f3ffcb, #fff8ffce, #fdebf3c7);
+
+  --hard-gradient: radial-gradient(circle at top left, #f70ea9, #33b1ff);
+}
+
+.dark {
+  --background:rgba(5, 10, 20, 0.95);
+  --foreground: #ffffff;
+  --prime2: #a84ab5;
+  --prime: #007bff;
+  --inputs: #29344d;
+  --blues: #1a8cd8;
+  --secbg: rgba(25, 30, 50, 0.85);
+  --glass-gradient: 
+
+  radial-gradient(
+    circle at 50% 50%,
+    rgba(40, 50, 80, 0.8), 
+    rgba(25, 30, 60, 0.7) 40%, 
+    rgba(15, 20, 40, 0.726) 80% 
+  ),
+  linear-gradient(
+    135deg,
+    rgba(0, 120, 212, 0.2) -10%,
+    rgba(147, 0, 255, 0.15) 30%,
+    rgba(0, 212, 255, 0.12) 60%, 
+    rgba(255, 255, 255, 0.178) 100% 
+  ),
+  radial-gradient(
+    ellipse at bottom,
+    rgba(255, 255, 255, 0.07),
+    rgba(255, 255, 255, 0.04)
+  );
+
+  --soft-gradient:  
+  radial-gradient(
+    circle at 25% 15%,
+    rgba(20, 27, 56, 0.97),
+    rgba(10, 13, 30, 0.92) 40%,
+    rgba(3, 6, 22, 0.87) 80%
+  ),
+  linear-gradient(
+    135deg,
+    rgba(0, 120, 212, 0.2) -10%,
+    rgba(147, 0, 255, 0.18) 30%,
+    rgba(0, 212, 255, 0.15) 60%,
+    rgba(255, 255, 255, 0.08) 100%
+  ),
+  radial-gradient(
+    ellipse at bottom right,
+    rgba(0, 140, 255, 0.15),
+    rgba(147, 0, 255, 0.1),
+    rgba(0, 212, 255, 0.07)
+  );
+
+  --hard-gradient: radial-gradient(circle at top left, #930876, #1a8cd8);
+
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    /* --background: #0a0a0a;
+    --foreground: #ededed; */
+/* --secbg: red; */
+
+/* }
+} */
+
+body {
+  /* color: var(--foreground); */
+  background: var(--background);
+  
+  /* font-family: Arial, Helvetica, sans-serif; */
+}
+input {
+  background: var(--inputs);
+}
+textarea{
+  background: var(--inputs);
+
+}
+@layer utilities {
+  .bg-soft-gradient {
+    background: var(--soft-gradient);
+  }
+
+  .bg-hard-gradient {
+    background: var(--hard-gradient);
+  }
+  .glass-effect {
+    position: relative;
+    background: var(--glass-gradient);
+    /* background-size: 200% 100%; */
+    /* animation: moveGradient 4s linear infinite; */
+    /* border-radius: 10px; */
+  }
+}
+
+
+
+.hard-glass-effect:hover {
+  position: relative;
+
+
+  background: radial-gradient(circle at top left, #fdebf3, #f8b3e1, #fdebf3, #afd4eb, #fdebf3, #e0f3ffcb);
+  color: #f70ea9;
+  background-size: 200% 100%;
+  /* font-weight: 600; */
+  transition: all ease-in-out 1s;
+  animation: moveGradient 5s linear infinite;
+
+}
+
+@keyframes moveGradient {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+
+/* Customizing NProgress */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: #db65e3 !important;
+  /* Change this to your preferred color */
+  height: 4px !important;
+  /* Adjust thickness */
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #007bff, 0 0 5px #007bff !important;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: #db65e3 !important;
+  border-left-color: #db65e3 !important;
+}

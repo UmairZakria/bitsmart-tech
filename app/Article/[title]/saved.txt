@@ -1,0 +1,418 @@
+
+import React, { useState, useTransition } from 'react'
+import LoadingSkeleton from '@/components/LoadingSkeleton';
+import axios from 'axios';
+import Image from 'next/image';
+import { ModeToggle } from '@/components/ModeToggle'
+
+import me3 from '@/public/ui/me3.jpeg'
+import Link from 'next/link';
+import { format } from 'date-fns';
+import { useRouter } from 'next/navigation'
+
+import {
+    FacebookShareButton,
+    TwitterShareButton,
+    WhatsappShareButton,
+    LinkedinShareButton,
+    FacebookIcon,
+    TwitterIcon,
+    LinkedinIcon,
+
+    WhatsappIcon,
+} from 'react-share';
+import Confetti from 'react-confetti';
+import { motion } from 'framer-motion';
+
+const Page = ({ post, data }) => {
+    const rout = useRouter()
+
+    const [showConfetti, setShowConfetti] = useState(false);
+    const resolvedParams = React.use(params);
+    const title = resolvedParams.title
+    const slug = resolvedParams.title
+    const [data, setData] = useState([])
+    const [isPending, startTransition] = useTransition();
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchdata, setSearchdata] = useState([])
+
+    const shareUrl = 'https://example.com';
+    const [post, setPost] = useState({})
+    const [likes, setLikes] = useState(post.likes)
+    const [context, setContext] = useState(false)
+    const [context2, setContext2] = useState('none')
+    const [context4, setContext4] = useState('none')
+    const [context3, setContext3] = useState(false)
+
+    const [comments, setComments] = useState([])
+    const [name, setName] = useState('')
+    const [discription, setDiscription] = useState('')
+    const [profile, setProfile] = useState('')
+    const getdata = (title) => {
+        setContext(true)
+        axios.get(`/api/blogpost?id=${title}`)
+            .then((res) => {
+                setPost(res.data.blog)
+                setLikes(res.data.blog.likes)
+                setComments(res.data.blog.comments)
+                setContext(false)
+
+            })
+            .catch((err) => { console.log(err) })
+
+
+    };
+    const getdata2 = async () => {
+        try {
+            const res = await axios.get('/api/blogpost');
+            console.log(res)
+            setData(res.data.blogs)
+            setSearchdata(res.data.blogs)
+        } catch (error) {
+            console.error('Error fetching post:', error);
+        }
+    }
+    useEffect(() => {
+        getdata(title)
+        getdata2()
+
+    }, [])
+
+    const handellikes = () => {
+        setShowConfetti(true);
+        let action = 'like'
+        startTransition(() => {
+            axios.put('/api/blogpost/', { action, slug, likes: likes + 1 })
+                .then((res) => {
+                    if (res.data.status == "success") {
+
+                        setLikes(res.data.updatedPost.likes)
+                        setTimeout(() => {
+                            setShowConfetti(false);
+                        }, 5000);
+
+
+
+                    }
+                })
+                .catch((err) => { console.log(err) })
+
+        })
+    }
+    const handelcomment = (e) => {
+        e.preventDefault();
+        let action = 'comment'
+        axios.put('/api/blogpost/', { action, slug, name, discription })
+            .then((res) => {
+                if (res.data.status == "success") {
+                    setProfile('Thank You For Interection')
+                    setTimeout(() => {
+                        setProfile('')
+                    }, 2000);
+                    setComments(res.data.updatedPost.comments)
+
+                }
+            })
+            .catch((err) => { console.log(err) })
+
+    }
+    const handelredrict = (title) => {
+        // const slug = createSlug(title);
+        rout.push(`/Article/${title}`);
+
+
+    }
+    useEffect(() => {
+        // setSearchdata(data)
+        const searchdata = data.filter(item =>
+            item.title.toLowerCase().includes(searchQuery.toLowerCase())
+            // ||
+            // item.category.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        if (searchQuery !== '') {
+            setSearchdata(searchdata)
+
+        } else if (searchQuery == '') {
+            setSearchdata(data)
+        }
+
+
+
+    }, [searchQuery])
+
+    const Navbar = () => {
+
+        return (
+            <div className=' md:px-10 px-2 flex flex-wrap  items-center justify-between  py-5'>
+                <div className='flex items-center gap-10'>
+
+                    <Link href={'/'} className='font-brittany  '>
+                        <span className="text-[36px]  md:text-[50px] dark:before:hover:text-white relative before:absolute before:top-[85%] before:left-[85%] before:font-sans before:text-lg before:font-[400] before:text-gray-400 font-bold before:content-['Insights']  ">Umair</span>
+                    </Link>
+
+                </div>
+                <div className='flex flex-wrap justify-evenly gap-3'>
+                    <div className='relative   '>
+                        {/* <button type="text" className='p-2  w-full  bg-gray-100 dark:bg-slate-600 px-6 rounded-3xl' placeholder='Search' name="" id="" /> */}
+                        <button onClick={() => setContext4('block')} className='p-2  w-full  bg-gray-100 dark:bg-slate-600 pr-5 pl-12 rounded-3xl' >Search</button>
+                        <img className='absolute left-2 top-[6px]' width="30" height="30" src="https://img.icons8.com/ios-glyphs/30/ffd502/search.png" alt="search" />
+                    </div>
+                    <ModeToggle />
+                </div>
+            </div>
+        )
+    }
+
+
+
+    return (
+        <>
+            {
+                context ? <LoadingSkeleton /> :
+                    <>
+                        <Navbar />
+                        <div className="container flex justify-center  py-16 mx-auto">
+
+                            <div className="mx-auto space-y-10 w-full lg:w-[750px]  ">
+                                {/*Post Title */}
+                                <h1 className='md:text-5xl text-3xl px-2 leading-10 font-ubuntu font-bold '>{post.title}</h1>
+                                {/* Name and Profile  */}
+                                <div className='my-5 flex items-center gap-6'>
+                                    <Image className='w-[60px] h-[60px] rounded-full object-cover' src={me3} alt="Umair" />
+                                    <div className='space-y-1   '>
+                                        <span className='font-mono text-lg' >Umair Zakria  <button onClick={() => setContext2('flex')} href={'/'} className='dark:text-lok dark:bg-transparent bg-lok rounded-lg dark:p-0 p-2 hover:underline '> .Follow </button></span> <br />
+                                        <span className='flex items-center gap-2 '><img width="24" height="24" src="https://img.icons8.com/windows/32/ffd502/calendar.png" alt="calendar" /> {post.date ? format(new Date(post.date), 'MMM dd yyyy') : ''}</span>
+
+                                    </div>
+
+                                </div>
+                                {/* Like , Comment and Shares */}
+                                <div className='p-3 border-y flex flex-wrap-reverse items-center justify-between   '>
+                                    <div className="flex flex-wrap items-center gap-2 md:gap-6">
+
+                                        <button onClick={handellikes} disabled={isPending} className={` ${isPending ? 'relative flex gap-1 items-center opacity-50 cursor-not-allowed ' : ' relative flex gap-1 items-center '} `} >
+
+                                            {showConfetti && (
+                                                <Confetti
+                                                    numberOfPieces={1000}
+                                                    recycle={true}
+                                                    gravity={0.3}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '-8px',
+                                                        left: '-8px',
+
+                                                    }}
+                                                    className='w-[140%] h-[140%]'
+                                                />
+                                            )}
+                                            <img width="30" height="30" src="https://img.icons8.com/quill/100/ffd502/applause.png" alt="applause" />
+                                            {likes}
+                                        </button>
+                                        <button onClick={() => setContext3(context3 ? false : true)} className='flex gap-2 items-center ' >
+                                            <img width="26" height="26" src="https://img.icons8.com/parakeet-line/50/ffd502/comments.png" alt="comments" />
+                                            {comments.length}
+
+                                        </button>
+                                    </div>
+
+
+                                    <div className=' flex   gap-2 md:gap-4 '>
+                                        <FacebookShareButton url={shareUrl} quote={title}>
+                                            <FacebookIcon size={32} round />
+                                        </FacebookShareButton>
+                                        <TwitterShareButton url={shareUrl} title={title}>
+                                            <TwitterIcon size={32} round />
+                                        </TwitterShareButton>
+                                        <LinkedinShareButton url={shareUrl} title={title}>
+                                            <LinkedinIcon size={32} round />
+                                        </LinkedinShareButton>
+
+                                        <WhatsappShareButton url={shareUrl} title={title}>
+                                            <WhatsappIcon size={32} round />
+                                        </WhatsappShareButton>
+                                    </div>
+
+
+                                </div>
+                                {/* Article */}
+                                <article dangerouslySetInnerHTML={{ __html: post.content }}>
+                                </article>
+                                {/* Article Footer */}
+                                <div className='p-3 pb-7 border-b flex items-center justify-between   '>
+                                    <div className="flex items-center gap-6">
+
+                                        <button onClick={handellikes} disabled={isPending} className={` ${isPending ? 'flex gap-1 items-center opacity-50 cursor-not-allowed ' : 'flex gap-1 items-center '} `} >
+                                            <img width="30" height="30" src="https://img.icons8.com/quill/100/ffd502/applause.png" alt="applause" />
+                                            <span className='underline'>Give a Clap</span>
+                                        </button>
+                                        |
+                                        <button onClick={() => setContext3(context3 ? false : true)} className='flex gap-1 items-center ' >
+
+                                            <img width="26" height="26" src="https://img.icons8.com/parakeet-line/50/ffd502/comments.png" alt="comments" />
+                                            <span className='underline '>Leave a comment</span>
+
+                                        </button>
+                                    </div>
+
+
+
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                        {/*Subscirbe to insights*/}
+                        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ display: context2 }} className="fixed items-center justify-center  bg-[#00000048] top-0 left-0 w-full h-screen ">
+                            <img
+                                onClick={() => setContext2('none')}
+                                className="fixed top-6 z-[100] right-6 cursor-pointer"
+                                width="50"
+                                height="50"
+                                src="https://img.icons8.com/ios-filled/50/FFFFFF/multiply-2.png"
+                                alt="Close"
+                            />
+                            <div className='p-10  space-y-4  bg-black dark:bg-[#ffffff3b] backdrop-blur-lg bg-opacity-10  '>
+                                <h1 className=' text-2xl font-ubuntu text-center'>Subscribe to Umair Insights  <br /> Latest Article </h1>
+
+                                <input type="email" className="w-full p-3 text-white bg-[#ffffff48] dark:placeholder:text-white placeholder:text-black dark:bg-[#00000049]  " placeholder='Enter Your Email' />
+                                <button className=" w-full font-semibold text-xl p-3 rounded-3xl text-black  bg-lok " >Subscribe</button>
+                            </div>
+
+                        </motion.div>
+                        {/*Search Area  */}
+                        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ display: context4 }} className="fixed  overflow-y-scroll bg-[#00000048] backdrop-blur-lg bg-opacity-10  top-0 left-0 w-full h-screen ">
+                            <img
+                                onClick={() => setContext4('none')}
+                                className="fixed md:top-6 md:size-[50px] size-[30px] z-[100] top-2 right-2 md:right-6 cursor-pointer"
+
+                                src="https://img.icons8.com/ios-filled/50/FFFFFF/multiply-2.png"
+                                alt="Close"
+                            />
+                            <div className=' w-full  py-10 flex items-center justify-center '>
+                                <motion.div initial={{ width: 100 }} whileInView={{ width: '70%' }} transition={{ delay: 0.7, duration: 0.6 }} className='relative '>
+                                        <input type="text" onChange={(e) => setSearchQuery(e.target.value)} placeholder='Search The Article' className='px-4  w-full dark:bg-[#00000041] bg-[#ffffffd2]  placeholder:text-black dark:placeholder:text-white  rounded-3xl py-3' />
+                                        <img className='absolute right-2 top-2   ' width="30" height="30" src="https://img.icons8.com/ios-glyphs/30/ffd502/search.png" alt="search" />
+
+                                </motion.div>
+
+                            </div>
+                            <div className="container  mx-auto grid md:grid-cols-2  grid-cols-1  md:gap-8 gap-5 my-3 lg:grid-cols-3  w-full " >
+                                {
+                                    searchdata.length > 0 ? <>
+                                        {
+
+                                            searchdata.slice(0, 6).map((data, index) => (
+                                                <div key={index} className='border-gray-400 shadow-2xl dark:bg-[#00000041] bg-[#ffffff1c]  dark:border-gray-700   rounded-lg border md:mx-0 mx-2 cursor-pointer space-y-1 pb-3 flex flex-col'>
+                                                    <img src={data.image} onClick={() => handelredrict(data.slug)} className='object-cover  rounded-t-lg  h-[200px]' alt={data.title} />
+
+                                                    <div onClick={() => handelredrict(data.slug)} className='mx-4 space-y-2'>
+                                                        <h1 className='dark:text-[#ffffffe0] md:text-3xl text-xl  lg:text-2xl line-clamp-2 font-semibold'>{data.title} </h1>
+                                                        <div className='flex w-full items-center justify-between  text-gray-800 font-normal dark:text-[#ffffffe0]' >
+                                                            <span className='flex items-center gap-2 '><img width="24" height="24" src="https://img.icons8.com/windows/32/ffd502/calendar.png" alt="calendar" /> {data.date ? format(new Date(data.date), 'MMM dd yyyy') : ''}</span>
+
+                                                        </div>
+                                                        <p className='text-sm dark:text-gray-300 text-gray-800   line-clamp-2'>{data.discription}</p>
+                                                    </div>
+
+
+                                                </div>
+
+                                            ))
+
+                                        }
+                                    </>
+                                        : <div>Sorry We Couldn't find AnyThing</div>
+                                }
+
+                            </div>
+
+                        </motion.div>
+                        {
+                            context3 ?
+                                <motion.div
+                                    initial={{ x: 300, opacity: 0 }}
+                                    whileInView={{ x: 0, opacity: 1 }}
+                                    exit={{ x: -300, opacity: 0 }}
+                                    transition={{ duration: 0.7 }}
+
+                                    className='fixed flex bottom-0 bg-black dark:bg-[#ffffff3b] backdrop-blur-lg bg-opacity-10  flex-col right-0 h-screen w-full md:w-[370px] '>
+                                    <div style={{ scrollbarWidth: 'none' }} className='h-auto flex-grow w-full px-4 py-15 mt-12 space-y-3 rounded-2xl overflow-y-scroll'>
+                                        {
+                                            comments ?
+                                                <>
+                                                    {
+                                                        comments.map((comment, index) => (
+                                                            <div key={index} className='bg-[#00000059] dark:bg-[#ffffff3b] py-4 px-4 rounded-md '>
+                                                                <h3 className='text-lg  underline font-semibold font-ubuntu'>{comment.name}</h3>
+                                                                <p className='text-[16px]  dark:text-gray-100'>{comment.discription}</p>
+
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </>
+
+                                                : ''
+                                        }
+
+
+                                    </div>
+                                    <div >
+                                        <form onSubmit={handelcomment} className='space-y-2 px-5 pt-2' >
+                                            {profile && <span className='text-red-700'>{profile}</span>}
+                                            <h4 className=' text-xl text-center  '>Make Your Comment that Shine </h4>
+                                            <input required onChange={(e) => setName(e.target.value)} type="text" className="w-full p-3 text-white rounded-md placeholder:text-white dark:bg-[#0000003f]" placeholder='Enter Your Name' />
+                                            <textarea required onChange={(e) => setDiscription(e.target.value)} name="" placeholder='Enter Your Comment' id="" className="w-full p-2 rounded-md placeholder:text-white dark:bg-[#0000003f] text-white  h-20  bg-slate-600" ></textarea>
+                                            <input value={'comment'} type="submit" className="cursor-pointer w-full font-semibold text-xl p-3 rounded-3xl bg-black text-white " />
+                                        </form>
+
+
+
+
+                                    </div>
+                                    <img
+                                        onClick={() => setContext3(false)}
+                                        className="absolute top-2 z-[100] rounded-full left-2 cursor-pointer"
+                                        width="36"
+                                        height="36"
+                                        src="https://img.icons8.com/ios-filled/50/000000/multiply-2.png"
+                                        alt="Close"
+                                    />
+
+
+
+                                </motion.div>
+                                : ''
+
+
+                        }
+
+
+                    </>
+
+            }
+        </>
+
+    )
+}
+
+export async function getServerSideProps(context) {
+    const { title } = context.params;
+
+    try {
+        // Fetch post data
+        const resPost = await axios.get(`/api/blogpost?id=${title}`);
+        const post = resPost.data.blog;
+
+        // Fetch related posts (optional)
+        const resRelated = await axios.get('/api/blogpost');
+        const relatedPosts = resRelated.data.blogs;
+
+        return { props: { post, relatedPosts } };
+    } catch (err) {
+        console.error(err);
+        return { notFound: true };
+    }
+}
+// export default Page
