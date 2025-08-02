@@ -243,7 +243,7 @@ export default function Home({ data, data2 }) {
               </motion.p>
             </div>
             <Textslow
-              delay={0.01}
+              delay={0.05}
               styles="dark:text-gray-400 text-lg text-gray-700 mt-4 md:w-1/2  text-center md:text-start  "
               text={
                 "At Bitsmart Tech, we combine creativity, technology, and strategy to deliver impactful digital experiences."
@@ -259,17 +259,7 @@ export default function Home({ data, data2 }) {
               Let’s Build Together <MoveRight className="" size={24} />
             </motion.button>
           </div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            viewport={{ once: true }}
-            whileInView={{ opacity: 1, transition: { delay: 0.01 } }}
-          >
-            <Image
-              className="md:block hidden image-adaptive invert-0 dark:invert transition-all duration-300 "
-              src={hero_side}
-              alt={text}
-            />
-          </motion.div>
+
         </div>
         <div className="py-10 lg:py-20"></div>
         <div className="px-5 bg-transparent lg:absolute lg:-bottom-1/4 lg:left-1/2  items-center justify-center lg:translate-x-[-50%] text-white container mx-auto flex gap-5 lg:flex-nowrap flex-wrap ">
